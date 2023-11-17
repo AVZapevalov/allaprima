@@ -16,7 +16,7 @@ type alias Model =
 init : Model
 init =
     { pixels = initialize 225 (\_ -> 0)
-    , selectedColor = 1 -- Используйте значение по умолчанию (например, 1)
+    , selectedColor = 1
     }
 
 -- UPDATE
@@ -24,6 +24,7 @@ init =
 type Msg
     = ClickedPixel Int
     | ChangeColor Int
+    | ClearCanvas
 
 update : Msg -> Model -> Model
 update msg model =
@@ -33,6 +34,9 @@ update msg model =
 
         ChangeColor color ->
             { model | selectedColor = color }
+        
+        ClearCanvas ->
+            { model | pixels = initialize 225 (\_ -> 0) }
 
 -- VIEW
 
@@ -50,6 +54,7 @@ view model =
                ]
                (List.indexedMap (\index color -> pixelView index color) (Array.toList model.pixels))
         , paletteView model.selectedColor
+        , button [ onClick ClearCanvas, style "margin-top" "10px" ] [ Html.text "Очистить рисунок" ]
         ]
         
 
