@@ -10,48 +10,75 @@ import Array exposing (Array, initialize, set)
 
 type alias Model =
     { pixels : Array Int
+    , selectedColor : Int
     }
 
 init : Model
 init =
-    { pixels = initialize 9 (\_ -> 0)
+    { pixels = initialize 225 (\_ -> 0)
+    , selectedColor = 1 -- Используйте значение по умолчанию (например, 1)
     }
 
 -- UPDATE
 
 type Msg
     = ClickedPixel Int
+    | ChangeColor Int
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         ClickedPixel index ->
-            { model | pixels = set index 2 model.pixels }
+            { model | pixels = set index model.selectedColor model.pixels }
+
+        ChangeColor color ->
+            { model | selectedColor = color }
 
 -- VIEW
 
 view : Model -> Html Msg
 view model =
-    div [ style "display" "flex"
+    div [ style "background-color" "#F5F5DC"
+        , style "display" "flex"
         , style "flex-direction" "column"
         , style "justify-content" "center"
         , style "align-items" "center"
         , style "height" "100vh"
         ]
         [ div [ style "display" "grid"
-               , style "grid-template-columns" "repeat(3, 50px)"
-               , style "grid-gap" "5px"
-               --, style "margin" "auto"
+               , style "grid-template-columns" "repeat(15, 30px)"
                ]
                (List.indexedMap (\index color -> pixelView index color) (Array.toList model.pixels))
+        , paletteView model.selectedColor
         ]
+        
+
+paletteView : Int -> Html Msg
+paletteView selectedColor =
+    div [ style "display" "flex"
+        , style "margin-top" "10px"
+        ]
+        (List.map (\color -> colorButtonView color selectedColor) [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+
+colorButtonView : Int -> Int -> Html Msg
+colorButtonView color selectedColor =
+    div
+        [ style "width" "20px"
+        , style "height" "20px"
+        , style "margin-right" "2px"
+        , style "background-color" (colorToCss color)
+        , style "cursor" "pointer"
+        , style "border" ("1px solid " ++ if color == selectedColor then "#000" else "#fff")
+        , onClick (ChangeColor color)
+        ]
+        []
 
 
 pixelView : Int -> Int -> Html Msg
 pixelView index color =
     div
-        [ style "width" "50px"
-        , style "height" "50px"
+        [ style "width" "30px"
+        , style "height" "30px"
         , style "border" "1px solid #ccc"
         , style "background-color" (colorToCss color)
         , style "cursor" "pointer"
@@ -63,8 +90,21 @@ colorToCss : Int -> String
 colorToCss color =
     case color of
         0 -> "#ffffff"
-        1 -> "#ff0000"
-        2 -> "#0000ff"
+        1 -> "#ff0000" -- Красный
+        2 -> "#0000ff" -- Синий
+        3 -> "#00ff00" -- Зеленый
+        4 -> "#ffff00" -- Желтый
+        5 -> "#000000" -- Черный
+        6 -> "#00ffff" -- Голубой
+        7 -> "#008000" -- Темнозеленый
+        8 -> "#ffA500" -- Оранжевый
+        9 -> "#FFC0CB" -- Розовый
+        10 -> "#800080" -- Фиолетовый
+        11 -> "#808080" -- Серый
+        12 -> "#ffffff" -- Белый
+        13 -> "#008080" -- Изумрудный
+        14 -> "#8B4513" -- Коричневый
+        15 -> "#FFD700" -- Золотой
         _ -> "#ffffff"
 
 -- SUBSCRIPTIONS
